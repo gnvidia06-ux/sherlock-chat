@@ -1,21 +1,57 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "../context/ChatContext";
 import ChatMessage from "../components/ChatMessage";
 import TypingIndicator from "../components/TypingIndicator";
 import ChatInput from "../components/ChatInput";
 
-export default function Chat() {
-  const { messages, isTyping, error, sendMessage, clearError } = useChat();
-  const bottomRef = useRef(null);
+const NEAR_BOTTOM_THRESHOLD = 80;
 
-  // Scroll automático al último mensaje (o al indicador de "escribiendo...")
+export default function Chat() {
+  const { messages, isTyping, error, sendMessage, clearError, clearHistory } = useChat();
+  const windowRef = useRef(null);
+  const bottomRef = useRef(null);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
+  function handleScroll() {
+    const el = windowRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    setIsNearBottom(distanceFromBottom < NEAR_BOTTOM_THRESHOLD);
+  }
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+    if (isNearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isTyping, isNearBottom]);
+
+  function handleClearHistory() {
+    const confirmed = window.confirm(
+      "¿Borrar todo el historial de esta conversación? Esta acción no se puede deshacer."
+    );
+    if (confirmed) {
+      clearHistory();
+    }
+  }
 
   return (
     <section className="page page--chat">
-      <div className="chat-window">
+      <div className="chat-toolbar">
+        {messages.length > 0 && (
+          <span className="chat-saved-indicator" title="El historial se guarda en este navegador">
+            ● Conversación guardada
+          </span>
+        )}
+        <button
+          className="chat-clear-btn"
+          onClick={handleClearHistory}
+          disabled={messages.length === 0}
+        >
+          Borrar historial
+        </button>
+      </div>
+
+      <div className="chat-window" ref={windowRef} onScroll={handleScroll}>
         {messages.length === 0 && (
           <p className="chat-window__empty">
             Escribile algo a Sherlock para empezar la conversación.

@@ -1,19 +1,42 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { sendMessageToCharacter } from "../api/geminiClient";
 
 const ChatContext = createContext(null);
+const STORAGE_KEY = "sherlock-chat-history";
 
-let idCounter = 0;
-function nextId() {
-  idCounter += 1;
-  return idCounter;
+function loadStoredMessages() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function getNextId(messages) {
+  const maxId = messages.reduce((max, m) => Math.max(max, m.id || 0), 0);
+  return maxId + 1;
 }
 
 export function ChatProvider({ children }) {
-  // El historial vive solo en memoria: se pierde al recargar la app (a propósito).
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => loadStoredMessages());
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState(null);
+
+  // Cada vez que cambia el historial, lo guardamos en localStorage.
+  useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch {
+      // Si localStorage falla (modo privado, cuota llena, etc.) seguimos igual.
+    }
+  }, [messages]);
 
   const sendMessage = useCallback(
     async (text) => {
@@ -21,7 +44,7 @@ export function ChatProvider({ children }) {
       if (!trimmed) return;
 
       const userMessage = {
-        id: nextId(),
+        id: getNextId(messages),
         role: "user",
         text: trimmed,
         timestamp: new Date().toISOString(),
@@ -40,7 +63,7 @@ export function ChatProvider({ children }) {
         const replyText = await sendMessageToCharacter(history);
 
         const assistantMessage = {
-          id: nextId(),
+          id: getNextId([...messages, userMessage]),
           role: "assistant",
           text: replyText,
           timestamp: new Date().toISOString(),
@@ -61,7 +84,17 @@ export function ChatProvider({ children }) {
 
   const clearError = useCallback(() => setError(null), []);
 
-  const value = { messages, isTyping, error, sendMessage, clearError };
+  const clearHistory = useCallback(() => {
+    setMessages([]);
+    setError(null);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // no-op
+    }
+  }, []);
+
+  const value = { messages, isTyping, error, sendMessage, clearError, clearHistory };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

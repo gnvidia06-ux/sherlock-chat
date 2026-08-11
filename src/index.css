@@ -42,7 +42,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-gold-dim) transparent;
@@ -58,10 +57,9 @@ body {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
-/* ---------- Header ---------- */
 .app-header {
   display: flex;
   flex-direction: column;
@@ -72,9 +70,7 @@ body {
   border-bottom: 1px solid var(--color-gold-dim);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
   color: var(--color-gold-soft);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex: none;
 }
 
 .app-header__brand {
@@ -124,7 +120,6 @@ body {
   right: 0;
 }
 
-/* ---------- Main / pages ---------- */
 .app__main {
   flex: 1;
   display: flex;
@@ -133,6 +128,8 @@ body {
   max-width: 720px;
   margin: 0 auto;
   padding: 2rem 1.25rem;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .page h1 {
@@ -214,16 +211,73 @@ body {
   transform: translateY(0);
 }
 
-/* ---------- Chat ---------- */
 .page--chat {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 104px);
+  min-height: 0;
+  overflow-y: hidden;
+  margin: -2rem -1.25rem;
+  padding: 2rem 1.25rem;
+}
+
+.chat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.25rem 0.5rem;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.chat-saved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+}
+
+.chat-saved-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  flex: none;
+}
+
+.chat-clear-btn {
+  background: none;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  color: var(--color-text-dim);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.chat-clear-btn:hover:not(:disabled) {
+  color: var(--color-gold-soft);
+  border-color: var(--color-gold);
+}
+
+.chat-clear-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .chat-window {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -293,13 +347,35 @@ body {
   font-size: 1.02rem;
 }
 
+.chat-message__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+
+.chat-message__copy {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.chat-message__copy:hover {
+  opacity: 1;
+}
+
 .chat-message__time {
-  display: block;
   font-size: 0.68rem;
   opacity: 0.55;
-  margin-top: 0.35rem;
-  text-align: right;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .chat-message__bubble--typing {
@@ -307,6 +383,13 @@ body {
   gap: 5px;
   align-items: center;
   padding: 0.95rem 1.15rem;
+}
+
+.typing-label {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-text-dim);
+  margin-right: 0.3rem;
 }
 
 .typing-dot {
@@ -317,10 +400,10 @@ body {
   animation: typing-bounce 1.2s infinite ease-in-out;
 }
 
-.typing-dot:nth-child(2) {
+.typing-dot:nth-child(3) {
   animation-delay: 0.15s;
 }
-.typing-dot:nth-child(3) {
+.typing-dot:nth-child(4) {
   animation-delay: 0.3s;
 }
 
@@ -347,6 +430,7 @@ body {
   border-radius: var(--radius);
   padding: 0.65rem 0.9rem;
   font-size: 0.92rem;
+  flex: none;
 }
 
 .chat-error button {
@@ -359,13 +443,13 @@ body {
   line-height: 1;
 }
 
-/* ---------- Chat input ---------- */
 .chat-input {
   display: flex;
   gap: 0.6rem;
   padding: 0.85rem 0.25rem;
   border-top: 1px solid var(--color-gold-dim);
   background: var(--color-bg-deep);
+  flex: none;
 }
 
 .chat-input__field {
@@ -417,10 +501,6 @@ body {
   cursor: not-allowed;
 }
 
-/* =========================================================
-   Breakpoints (mobile-first)
-   ========================================================= */
-
 @media (min-width: 600px) {
   .app-header {
     flex-direction: row;
@@ -429,6 +509,11 @@ body {
   }
 
   .app__main {
+    padding: 2.5rem 1.75rem;
+  }
+
+  .page--chat {
+    margin: -2.5rem -1.75rem;
     padding: 2.5rem 1.75rem;
   }
 
@@ -448,7 +533,8 @@ body {
   }
 
   .page--chat {
-    height: calc(100vh - 124px);
+    margin: -3rem -2rem;
+    padding: 3rem 2rem;
   }
 
   .chat-message__bubble {
