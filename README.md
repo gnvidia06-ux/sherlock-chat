@@ -8,7 +8,27 @@ Elegí a Sherlock porque tiene una personalidad bien marcada y eso ayuda mucho
 a la hora de armar un buen system prompt: deductivo, un poco arrogante, con
 tono formal pero con humor.
 
+## El personaje
+
+Sherlock Holmes es el detective consultor de Baker Street 221B, creado por
+Arthur Conan Doyle. En este proyecto lo trasladé a la actualidad: sigue
+siendo el mismo observador implacable y maestro de la deducción, pero
+"vive" en el presente y puede chatear por texto. Sus rasgos principales
+en el chat:
+
+- **Deductivo**: hace pequeñas deducciones sobre lo que escribís (tu forma
+  de tipear, la hora, el tema que elegís) aunque sean especulativas
+- **Formal pero ingenioso**: nunca grosero, pero sí un poco arrogante
+- **Impaciente con la vaguedad**: pide precisión si algo es ambiguo
+- **Breve**: responde en 1-2 oraciones, como corresponde a un chat real
+
 👉 **Probalo en vivo:** https://sherlock-chat-iota.vercel.app
+## Capturas
+
+![Captura 1](screenshots/scren1.png)
+![Captura 2](screenshots/scren2.png)
+![Captura 3](screenshots/scren3.png)
+![Captura 4](screenshots/scren4.png)
 
 ## Qué tiene
 
@@ -93,3 +113,29 @@ Corre los tests de componentes, routing y del cliente que llama a
 
 React + Vite, React Router, Vercel Functions, Vitest + React Testing
 Library, CSS puro (mobile-first, con media queries en 600px y 1024px).
+
+## Uso de IA en este proyecto
+
+Usé Claude (Anthropic) como asistente durante todo el desarrollo, en modo
+guiado: yo escribí el código en VS Code, y la IA me fue explicando paso a
+paso qué hacer y por qué, sin escribir el código por mí. Concretamente me
+ayudó con:
+
+- Explicarme conceptos que no conocía (qué es un commit, qué es la History
+  API, por qué usar una Vercel Function en vez de llamar a Gemini directo
+  desde el cliente)
+- Guiarme en la instalación y configuración del entorno (Node, Git, Vercel
+  CLI) y resolver errores puntuales que me fueron apareciendo (permisos de
+  PowerShell, scripts bloqueados, etc.)
+- Debuggear problemas concretos: un error de autenticación con la API de
+  Gemini por un cambio reciente en el formato de las keys de Google, y un
+  bug de layout en CSS que hacía que el input del chat quedara fuera de
+  pantalla al scrollear
+- Redactar el system prompt del personaje y ajustarlo cuando las respuestas
+  quedaban muy largas o muy cortas
+- Sugerirme mejoras de UX (indicador de "escribiendo...", scroll
+  inteligente, persistencia con localStorage) que después implementé
+
+Las decisiones de diseño (qué personaje elegir, qué extras implementar, el
+estilo visual "victoriano/noir") fueron mías; la IA me ayudó a ejecutarlas
+técnicamente.
