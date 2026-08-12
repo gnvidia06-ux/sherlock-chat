@@ -28,8 +28,9 @@ export default function About() {
 
       <h2>Notas</h2>
       <p>
-        El historial de la conversación se guarda solo en memoria durante la sesión:
-        si recargás la página, se reinicia.
+        El historial de la conversación se guarda en el navegador (localStorage), así que
+  persiste aunque recargues la página. Hay un botón para borrarlo cuando quieras
+  empezar de cero.
       </p>
     </section>
   );
