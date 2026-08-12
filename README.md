@@ -139,3 +139,13 @@ ayudó con:
 Las decisiones de diseño (qué personaje elegir, qué extras implementar, el
 estilo visual "victoriano/noir") fueron mías; la IA me ayudó a ejecutarlas
 técnicamente.
+### Evidencia adicional
+
+Además de este resumen, dejé documentadas algunas preguntas técnicas
+concretas que le hice a la IA sobre el proyecto ya armado (por ejemplo:
+por qué fallaba la autenticación con Gemini, qué es el error 429, qué
+son los warnings de `npm allow-scripts`, diferencia entre `npm run dev`
+y `vercel dev`, entre otras). Las capturas de esas preguntas y respuestas
+están en esta carpeta de Drive:
+
+👉 [Ver capturas de uso de IA](https://drive.google.com/drive/folders/1PKg4WsbyeG2wcXUqdOI4TwiesCxa_Sdm?usp=sharing)
