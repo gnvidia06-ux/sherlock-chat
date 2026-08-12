@@ -1,127 +1,95 @@
-# Chat con Sherlock Holmes (Gemini AI)
+# Chat con Sherlock Holmes 🕵️
 
-SPA en React que permite chatear con Sherlock Holmes, usando Google Gemini AI a
-través de una Vercel Function (así la API key nunca se expone en el cliente).
+Este es mi TP de SPA: una app en React donde podés chatear con Sherlock Holmes,
+potenciado por Google Gemini AI. La idea era practicar routing, conexión segura
+a una IA externa (sin exponer la key en el cliente) y deploy en Vercel.
 
-## Rutas
+Elegí a Sherlock porque tiene una personalidad bien marcada y eso ayuda mucho
+a la hora de armar un buen system prompt: deductivo, un poco arrogante, con
+tono formal pero con humor.
 
-- `/home` — presentación del personaje
-- `/chat` — el chat en sí
-- `/about` — info del proyecto
+👉 **Probalo en vivo:** https://sherlock-chat-iota.vercel.app
 
-## 1. Correr el proyecto en local
+## Qué tiene
+
+- Rutas: `/home`, `/chat`, `/about` (con React Router, back/forward andan bien)
+- Chat con Sherlock: burbujas diferenciadas, "está escribiendo...", manejo de
+  errores si falla la API, scroll automático (pero inteligente: si scrolleás
+  para arriba a leer algo viejo, no te empuja de nuevo abajo)
+- El historial se guarda en el navegador (localStorage), así que si recargás
+  la página no perdés la conversación. Hay un botón para borrarlo si querés
+  empezar de cero, con confirmación antes de borrar
+- Botón para copiar las respuestas de Sherlock
+- Enter para enviar, además del botón
+- Timestamps en cada mensaje
+- Diseño responsive, mobile-first (probado en mobile / tablet / desktop)
+- La API key de Gemini nunca toca el navegador: todo pasa por una Vercel
+  Function (`api/chat.js`) que corre en el servidor
+- 11 tests unitarios con Vitest + Testing Library
+
+## Cómo correrlo en tu máquina
 
 ```bash
 npm install
-```
-
-Copiá `.env.example` a `.env` y completá tu API key (ver paso 2):
-
-```bash
 cp .env.example .env
 ```
 
-Para desarrollo local, `vite` solo sirve el frontend — **no** ejecuta las
-funciones serverless de `/api`. Para probar el chat completo en tu máquina
-necesitás la CLI de Vercel (ver paso 4, `vercel dev`). Si solo querés ver el
-diseño de las páginas sin el chat funcionando, alcanza con:
+Completá tu `.env` con tu propia API key de Gemini (ver más abajo cómo
+conseguirla).
+
+Para ver solo el diseño de las páginas, alcanza con:
 
 ```bash
 npm run dev
 ```
 
-## 2. Conseguir tu Gemini API Key (gratis)
-
-1. Entrá a **https://aistudio.google.com/apikey** con tu cuenta de Google.
-2. Hacé clic en **"Create API key"** (o "Crear clave de API").
-3. Elegí un proyecto de Google Cloud existente o dejá que te cree uno nuevo.
-4. Copiá la key generada (empieza con algo como `AIza...`). **No la compartas
-   ni la subas a GitHub.**
-5. El plan gratuito de Gemini tiene límites de uso por minuto/día — de sobra
-   para este proyecto.
-
-## 3. Configurar la key en local
-
-En tu archivo `.env` (que ya está en `.gitignore`, nunca se sube):
-
-```
-GEMINI_API_KEY=tu_api_key_copiada
-GEMINI_MODEL=gemini-3.5-flash
-```
-
-`GEMINI_MODEL` es opcional — si no lo ponés, se usa `gemini-3.5-flash` por
-defecto. Revisá en https://ai.google.dev/gemini-api/docs/models cuál es el
-modelo vigente al momento en que lo despliegues, porque Google va
-discontinuando versiones viejas cada tanto.
-
-## 4. Probar las funciones serverless en local (opcional pero recomendado)
+Pero como el chat necesita la función serverless (`/api/chat`), y `vite` solo
+no la corre, para probar el chat completo en local hace falta la CLI de
+Vercel:
 
 ```bash
 npm install -g vercel
 vercel dev
 ```
 
-La primera vez te va a pedir loguearte y "linkear" el proyecto (podés crear
-uno nuevo o usar uno existente). Con `vercel dev` corriendo, `/api/chat` va a
-funcionar igual que en producción, así podés probar el chat completo antes de
-desplegar.
+Y ahí sí, `http://localhost:3000/chat` funciona igual que en producción.
 
-## 5. Desplegar en Vercel
+## Conseguir tu propia API key de Gemini (gratis)
 
-### Opción A — desde la web (más simple)
+1. Entrá a https://aistudio.google.com/apikey con tu cuenta de Google
+2. "Create API key"
+3. Copiá la key y pegala en tu `.env`:
+GEMINI_API_KEY=tu_key_aca
+GEMINI_MODEL=gemini-3.5-flash
+Un par de cosas que aprendí en el camino, por si a alguien más le pasa:
+- El nivel gratuito tiene un límite bajo de pedidos por día (20 para este
+  modelo). Si ves un error 429 en los logs, es por eso, no es un bug.
+- A veces Google devuelve un formato de key distinto al `AIzaSy...` de
+  siempre. Si te tira "API key not valid" aunque la key sea correcta, probá
+  mandarla como parámetro `?key=` en la URL en vez de como header
+  `x-goog-api-key` — a mí me lo solucionó.
 
-1. Subí este proyecto a un repositorio de GitHub.
-2. Entrá a **https://vercel.com**, iniciá sesión (podés usar tu cuenta de
-   GitHub) y hacé clic en **"Add New... > Project"**.
-3. Elegí el repo. Vercel detecta automáticamente que es un proyecto Vite/React.
-4. Antes de desplegar, andá a **"Environment Variables"** y agregá:
-   - `GEMINI_API_KEY` → tu key de Gemini
-   - `GEMINI_MODEL` → (opcional) el modelo que quieras usar
-5. Hacé clic en **"Deploy"**.
+## Deploy en Vercel
 
-### Opción B — desde la terminal
+1. Subí el repo a GitHub
+2. En vercel.com, "Add New > Project" y importá el repo (detecta Vite solo)
+3. Antes de deployar, cargá las Environment Variables: `GEMINI_API_KEY` y
+   `GEMINI_MODEL`
+4. Deploy
 
-```bash
-npm install -g vercel
-vercel login
-vercel
-```
+Si cambiás alguna variable de entorno después, hay que hacer un Redeploy
+manual para que el cambio se aplique — no pasa solo.
 
-Seguí las preguntas (nombre de proyecto, framework detectado = Vite). Después
-de crear el proyecto, configurá las variables de entorno:
-
-```bash
-vercel env add GEMINI_API_KEY
-vercel env add GEMINI_MODEL
-```
-
-Y desplegá a producción:
-
-```bash
-vercel --prod
-```
-
-### Verificar que el deploy funciona
-
-1. Abrí la URL que te da Vercel.
-2. Andá a `/chat` y mandá un mensaje.
-3. Si ves un error, revisá en el dashboard de Vercel: **Project → Deployments
-   → (tu deploy) → Functions → api/chat** para ver los logs y el motivo del
-   error (normalmente: falta la env var, o el nombre del modelo está mal).
-
-## 6. Tests
+## Tests
 
 ```bash
 npm test
 ```
 
-Corre los tests unitarios con Vitest + React Testing Library (componentes,
-routing y el cliente que llama a `/api/chat`).
+Corre los tests de componentes, routing y del cliente que llama a
+`/api/chat`.
 
-## Notas de seguridad
+## Stack
 
-- La `GEMINI_API_KEY` solo existe como variable de entorno del servidor
-  (Vercel Function en `api/chat.js`). El navegador nunca la recibe.
-- El historial de chat vive únicamente en memoria de React durante la sesión:
-  se pierde al recargar la página (a propósito, según el alcance del
-  proyecto).
+React + Vite, React Router, Vercel Functions, Vitest + React Testing
+Library, CSS puro (mobile-first, con media queries en 600px y 1024px).
